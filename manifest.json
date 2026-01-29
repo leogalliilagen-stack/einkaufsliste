@@ -1,21 +1,32 @@
 {
-  "name": "Einkaufsliste",
-  "short_name": "Einkauf",
-  "description": "Deine persönliche Einkaufsliste App",
-  "start_url": "/",
+  "name": "Einkaufsliste App",
+  "short_name": "Einkaufen",
+  "description": "Moderne Einkaufsliste mit Kategorien, Scanner und Dark Mode",
+  "start_url": "/einkaufsliste/",
+  "scope": "/einkaufsliste/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
       "type": "image/png"
     }
   ]
