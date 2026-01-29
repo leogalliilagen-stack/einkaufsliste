@@ -1,0 +1,5 @@
+create_icons.py
+generate-icons.html
+.DS_Store
+*.psd
+node_modules/

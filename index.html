@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Einkaufsliste">
+    <title>Einkaufsliste</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-icon">🛒</div>
+            <h1>Einkaufsliste</h1>
+            <p>Melden Sie sich an, um Ihre Listen zu synchronisieren</p>
+            <input type="email" id="emailInput" placeholder="E-Mail">
+            <input type="password" id="passwordInput" placeholder="Passwort">
+            <button id="loginBtn" class="primary-btn">Anmelden</button>
+            <button id="registerBtn" class="secondary-btn">Registrieren</button>
+            <button id="skipLoginBtn" class="skip-btn">Ohne Anmeldung fortfahren</button>
+            <div id="loginError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app" id="mainApp" style="display: none;">
+        <header>
+            <div class="header-content">
+                <h1>🛒 Einkaufsliste</h1>
+                <div class="header-actions">
+                    <button id="shareBtn" class="icon-btn" title="Liste teilen">📤</button>
+                    <button id="logoutBtn" class="icon-btn" title="Abmelden">👤</button>
+                </div>
+            </div>
+            <div id="userInfo" class="user-info"></div>
+        </header>
+
+        <!-- Search & Filter Bar -->
+        <div class="search-container">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="🔍 Suchen..."
+                autocomplete="off"
+            >
+            <select id="categoryFilter" class="filter-select">
+                <option value="all">Alle Kategorien</option>
+                <option value="Obst & Gemüse">🥬 Obst & Gemüse</option>
+                <option value="Fleisch & Fisch">🥩 Fleisch & Fisch</option>
+                <option value="Milchprodukte">🥛 Milchprodukte</option>
+                <option value="Brot & Backwaren">🍞 Brot & Backwaren</option>
+                <option value="Getränke">🥤 Getränke</option>
+                <option value="Haushalt">🧹 Haushalt</option>
+                <option value="Sonstiges">📦 Sonstiges</option>
+            </select>
+            <button id="darkModeBtn" class="icon-btn-small" title="Dark Mode">🌙</button>
+        </div>
+
+        <!-- Add Item Container -->
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="itemInput" 
+                placeholder="Artikel hinzufügen..."
+                autocomplete="off"
+            >
+            <select id="categorySelect" class="category-select">
+                <option value="Sonstiges">📦</option>
+                <option value="Obst & Gemüse">🥬</option>
+                <option value="Fleisch & Fisch">🥩</option>
+                <option value="Milchprodukte">🥛</option>
+                <option value="Brot & Backwaren">🍞</option>
+                <option value="Getränke">🥤</option>
+                <option value="Haushalt">🧹</option>
+            </select>
+            <button id="scanBtn" title="Liste scannen">📷</button>
+            <button id="addBtn">+</button>
+        </div>
+
+        <!-- Quick Add Favorites -->
+        <div class="favorites-container" id="favoritesContainer">
+            <div class="favorites-title">⭐ Favoriten</div>
+            <div class="favorites-scroll" id="favoritesList"></div>
+        </div>
+
+        <!-- Camera Scanner -->
+        <div id="cameraModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📷 Liste scannen</h2>
+                    <button id="closeCameraBtn" class="close-btn">&times;</button>
+                </div>
+                <video id="cameraPreview" autoplay playsinline></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <div class="camera-actions">
+                    <button id="captureBtn" class="capture-btn">Foto aufnehmen</button>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <button id="uploadBtn" class="secondary-btn">Oder Bild hochladen</button>
+                </div>
+                <div id="scanResult" class="scan-result"></div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stats-left">
+                <span id="totalItems">0 Artikel</span>
+                <span id="checkedItems">0 erledigt</span>
+            </div>
+            <div class="stats-right">
+                <select id="sortSelect" class="sort-select">
+                    <option value="newest">⏰ Neueste</option>
+                    <option value="oldest">📅 Älteste</option>
+                    <option value="name">🔤 A-Z</option>
+                    <option value="category">📂 Kategorie</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="active">🛒 Aktiv (<span id="activeCount">0</span>)</button>
+            <button class="tab" data-tab="completed">✅ Erledigt (<span id="completedCount">0</span>)</button>
+            <button class="tab" data-tab="favorites">⭐ Favoriten (<span id="favCount">0</span>)</button>
+        </div>
+
+        <ul id="shoppingList" class="shopping-list"></ul>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state-inline" style="display: none;">
+            <div class="empty-icon">🛒</div>
+            <p>Keine Artikel gefunden</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button id="clearCompleted" class="action-btn danger">🗑️ Erledigte löschen</button>
+            <button id="statsBtn" class="action-btn primary">📊 Statistiken</button>
+        </div>
+
+        <!-- Statistics Modal -->
+        <div id="statsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📊 Statistiken</h2>
+                    <button class="close-btn" onclick="closeStatsModal()">&times;</button>
+                </div>
+                <div class="stats-content">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalItemsStat">0</div>
+                        <div class="stat-label">Gesamt Artikel</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedStat">0</div>
+                        <div class="stat-label">Erledigt</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingStat">0</div>
+                        <div class="stat-label">Offen</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="favoriteStat">0</div>
+                        <div class="stat-label">Favoriten</div>
+                    </div>
+                    <h3>📂 Nach Kategorie</h3>
+                    <div id="categoryStats" class="category-stats"></div>
+                    <h3>⭐ Top 5 Artikel</h3>
+                    <div id="topItems" class="top-items"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Tesseract.js for OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>
